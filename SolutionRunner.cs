@@ -4,11 +4,11 @@ namespace Advent_of_Code_2023;
 
 public static class SolutionRunner
 {
-    private static List<DaySolution> _days = new()
-    {
+    private static readonly List<DaySolution> Days =
+    [
         new DayOne(1),
         new DayTwo(2),
-    };
+    ];
 
     private static readonly Stopwatch Stopwatch = new Stopwatch();
 
@@ -24,9 +24,31 @@ public static class SolutionRunner
         if (debugAnswer.FirstOrDefault() != 't' || debugAnswer.FirstOrDefault() != 'f' ||
             char.IsDigit(partAnswer.FirstOrDefault()) || char.IsDigit(dayAnswer.FirstOrDefault()))
         {
+            Console.WriteLine("Something went wrong, please try again");
             Run();
         }
-        var config = (debugAnswer, partAnswer, dayAnswer);
+
+        var debug = debugAnswer.First() == 't';
+        var daysToRun = dayAnswer.Split(",").Select(int.Parse).ToList();
+        var partsToRun = partAnswer.Split(",").Select(int.Parse).ToList();
+        foreach (var day in Days.Where(day => daysToRun.Contains(day.Day)))
+        {
+            Console.WriteLine($"Day {day.Day}");
+            var input = ConvertInput(File.ReadAllText($"Input/Day{day.Day}.txt"), true);
+            if (partsToRun.Contains(1))
+            {
+                Console.WriteLine("Part One:");
+                TimeSolution(day.PartOne, input);
+                Console.WriteLine($"Elapsed time: {Stopwatch.ElapsedMilliseconds} ms");
+            }
+
+            if (partsToRun.Contains(2))
+            {
+                Console.WriteLine("Part Two:");
+                TimeSolution(day.PartTwo, input);
+                Console.WriteLine($"Elapsed time: {Stopwatch.ElapsedMilliseconds} ms");
+            }
+        }
     }
 
     private static Tuple<string, string, string> LoadConfig()
@@ -34,7 +56,7 @@ public static class SolutionRunner
         throw new NotImplementedException();
     }
 
-    public static List<string> ConvertInput(string input, bool removeLast)
+    private static List<string> ConvertInput(string input, bool removeLast)
     {
         return input.Split("\n").SkipLast(removeLast ? 1 : 0).ToList();
     }
